@@ -1,0 +1,120 @@
+"""
+Data source: https://catalog.data.gov/dataset/electric-vehicle-population-data
+
+This data represents a collection of how Electric cars have improved in a variety of different type of tests.
+These are based on multiple different factors:
+-Electric Range
+-Type (Plug-in, battery, etc.)
+-Clean Alternative Fuel Vehicle (CAFV) eligibility
+
+
+"""
+
+# Import necessary libraries
+import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+
+
+def main():
+    # Apply the default theme
+    sns.set_theme()
+
+    # Importing datafile
+    file = pd.read_csv('EV Data.csv')
+    # Call the plot mosaic function to create it
+    create_mosaic(file)
+    # Call the pie graph creation function
+    create_pie(file)
+    # Call the scatter plot function
+    create_scatter(file)
+    # Call the 2nd pie graph creation function
+    create_pie2(file)
+
+
+# Defines the create_mosaic function, which will create a 2x2 mosaic of graphs.
+def create_mosaic(file):
+    # Create the figure
+    fig, ax = plt.subplot_mosaic([['Graph 1', 'Graph 2']],
+                                 layout = 'constrained')
+
+    # Create rows and columns Graph 1
+    rows_1 = file[file['Make'] == 'TESLA']['Model']
+    cols_1 = file[file['Make'] == 'TESLA']['Electric Range']
+
+    # Create a bar graph based on the rows and columns established for Graph 1
+    ax['Graph 1'].bar(rows_1, cols_1, color='green')
+    ax['Graph 1'].set_ylabel("Electric Range (Number of Miles)", fontsize=10, fontweight='bold')
+    ax['Graph 1'].set_xlabel("Model of Tesla", fontsize=10, fontweight='bold')
+    ax['Graph 1'].xaxis.set_tick_params(labelsize=8)
+    ax['Graph 1'].yaxis.set_tick_params(labelsize=8)
+    ax['Graph 1'].set_title("Tesla Electric Range by Model Type", fontsize=14, fontweight='extra bold')
+
+    # Create a Seaborn area plot, depicting the density of each Model Year, while
+    # realigning the plot to the mosaic.
+    sns.kdeplot(file, x='Model Year', color="green", ax= ax['Graph 2'])
+    ax['Graph 2'].xaxis.set_tick_params(labelsize=8)
+    ax['Graph 2'].yaxis.set_tick_params(labelsize=8)
+    ax['Graph 2'].set_ylabel("Density", fontsize=10, fontweight='bold')
+    ax['Graph 2'].set_xlabel("Year of Production", fontsize=10, fontweight='bold')
+    ax['Graph 2'].set_title("Density of Electric Car Production (By Year)",
+                            fontsize=14, fontweight='extra bold')
+
+    # Display the plot mosaic
+    plt.show()
+
+
+def create_pie(file):
+    # Set the colors for the figure
+    colors = sns.color_palette('pastel')[0:10]
+
+    # Set the data for the pie chart
+    data = file['Electric Utility'].value_counts()
+
+    # Drop duplicates from the dataframe and convert the series to a dataframe.
+    col = file['Electric Utility'].to_frame()
+    new_data = col.drop_duplicates(subset=['Electric Utility'])
+
+    # Create the pie with a legend
+    plt.pie(data, colors=colors, textprops={'fontsize': 12, 'fontweight': 'bold'}, autopct='%.0f%%')
+    plt.legend(new_data['Electric Utility'])
+    plt.title("Place of Electric Power", fontsize=14, fontweight='extra bold')
+
+    plt.show()
+
+
+def create_scatter(file):
+    # Establish the rows and columns for the scatterplot
+    rows_3 = file[file['Make'] == 'TESLA']['Model']
+    cols_3 = file['Electric Range']
+
+    # Create the scatterplot
+    sns.scatterplot(x=rows_3, y=cols_3, s=20, color=".2")
+    plt.title("Electric Range by Vehicle Make", fontsize=14, fontweight='extra bold')
+    plt.ylabel("Electric Range (In miles)")
+
+    plt.show()
+
+
+def create_pie2(file):
+    # Set the colors for the figure
+    colors = sns.color_palette('deep')[0:10]
+
+    # Set the data for the pie chart
+    data = file['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].value_counts()
+
+    # Drop duplicates from the dataframe and convert the series to a dataframe.
+    col = file['Clean Alternative Fuel Vehicle (CAFV) Eligibility'].to_frame()
+    new_data = col.drop_duplicates(subset=['Clean Alternative Fuel Vehicle (CAFV) Eligibility'])
+
+    # Create the pie with a legend
+    plt.pie(data, colors=colors, textprops={'fontsize': 12, 'fontweight': 'bold'}, autopct='%.0f%%')
+    plt.legend(new_data['Clean Alternative Fuel Vehicle (CAFV) Eligibility'])
+    plt.title("Clean Alternative Fuel Vehicle Eligibility", fontsize=14, fontweight='extra bold')
+
+    plt.show()
+
+
+if __name__ == "__main__":
+    main()
+
